@@ -43,3 +43,11 @@ npm install --save-dev @types/react typescript
 
 npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
 npx tailwindcss init -p
+
+// in client
+npm install axios;
+// in server
+npm install cors
+npm install -D @types/cors
+
+<!-- 注意， setCookie的时候，需要调整参数，让client信任Server -->
