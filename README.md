@@ -33,7 +33,7 @@ tsc
 npx tsc
 tsc --noEmit
 
-npm run typeorm migration:generate -- --name create-comments-table
+npm run typeorm migration:generate -- --name create-users-table
 npm run typeorm migration:run
 npm run typeorm migration:revert
 
@@ -41,7 +41,7 @@ npx create-next-app client
 
 npm install --save-dev @types/react typescript
 
-npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+npm install tailwindcss@latest postcss@latest autoprefixer@latest
 npx tailwindcss init -p
 
 // in client
@@ -51,3 +51,26 @@ npm install cors
 npm install -D @types/cors
 
 <!-- 注意， setCookie的时候，需要调整参数，让client信任Server -->
+
+// in client
+npm install dayjs
+// in server
+npm run typeorm migration:generate -- -n create-votes-table
+npm run typeorm migration:run
+
+// in server
+npm i -D concurrently
+npm i typeorm-seeding
+
+npm run typeorm schema:drop
+npm run typeorm migration:run
+npm run seed
+
+// in client
+npm i swr
+
+// in server
+npm install multer
+npm install -D @types/multer
+
+NODE_ENV=production npm start

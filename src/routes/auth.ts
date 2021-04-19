@@ -6,6 +6,7 @@ import cookie from "cookie";
 
 import User from "../entity/User";
 import auth from "../middleware/auth";
+import user from "../middleware/user";
 
 const mapErrors = (errors: Object[]) => {
   return errors.reduce((prev: any, err: any) => {
@@ -72,7 +73,7 @@ const login = async (req: Request, res: Response) => {
       "Set-Cookie",
       cookie.serialize("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 3600,
         path: "/",
@@ -94,7 +95,7 @@ const logout = (_: Request, res: Response) => {
     "Set-Cookie",
     cookie.serialize("token", "", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      // secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       expires: new Date(0), // expires immediately
       path: "/",
@@ -107,7 +108,7 @@ const logout = (_: Request, res: Response) => {
 const router = Router();
 router.post("/register", register);
 router.post("/login", login);
-router.get("/me", auth, me); // add the middleware "auth" for this route
-router.get("/logout", auth, logout);
+router.get("/me", user, auth, me); // add the middleware "auth" for this route
+router.get("/logout", user, auth, logout);
 
 export default router;

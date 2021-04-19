@@ -1,19 +1,21 @@
 import {
   Entity as TOEntity,
   Column,
-  Index,
   BeforeInsert,
   ManyToOne,
   JoinColumn,
   OneToMany,
+  // AfterLoad,
 } from "typeorm";
 
 import Entity from "./Entity";
 import User from "./User";
 import Sub from "./Sub";
 import Comment from "./Comment";
+import Vote from "./Vote";
 
 import { makeId, slugify } from "../util/helpers";
+import { Exclude, Expose } from "class-transformer";
 
 @TOEntity("posts")
 export default class Post extends Entity {
@@ -22,15 +24,15 @@ export default class Post extends Entity {
     Object.assign(this, post);
   }
 
-  @Index()
-  @Column()
+  // @Index()
+  @Column({ unique: true })
   identifier: string; // 7 chars Id
 
   @Column()
   title: string;
 
-  @Index()
-  @Column()
+  // @Index()
+  @Column({ unique: true })
   slug: string;
 
   @Column({ nullable: true, type: "text" })
@@ -38,6 +40,9 @@ export default class Post extends Entity {
 
   @Column()
   subName: string;
+
+  @Column()
+  username: string;
 
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: "username", referencedColumnName: "username" })
@@ -47,8 +52,39 @@ export default class Post extends Entity {
   @JoinColumn({ name: "subName", referencedColumnName: "name" })
   sub: Sub;
 
+  @Exclude()
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
+
+  @Exclude()
+  @OneToMany(() => Vote, (vote) => vote.post)
+  votes: Vote[];
+
+  // method 1
+  @Expose() get url(): string {
+    return `/r/${this.subName}/${this.identifier}/${this.slug}`;
+  }
+
+  @Expose() get commentCount(): number {
+    return this.comments?.length;
+  }
+
+  @Expose() get voteScore(): number {
+    return this.votes?.reduce((prev, cur) => prev + (cur.value || 0), 0);
+  }
+
+  protected userVote: number;
+  setUserVote(user: User) {
+    const index = this.votes?.findIndex((v) => v.username === user.username);
+    this.userVote = index > -1 ? this.votes[index].value : 0;
+  }
+
+  // method 2
+  // protected url: string;
+  // @AfterLoad()
+  // createFields() {
+  //   this.url = `/r/${this.subName}/${this.identifier}/${this.slug}`;
+  // }
 
   @BeforeInsert()
   makeIdAndSlug() {
