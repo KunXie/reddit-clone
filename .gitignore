@@ -5,6 +5,6 @@ build/
 tmp/
 temp/
  /**/*.env
- .env
+ *.env
  ormconfig.json
  public/
